@@ -9,10 +9,10 @@
 ;; Copyright (c) 2006, 2011 Le Wang
 
 ;; Version: 0.2
-;; Last-Updated: Thu Feb  3 16:58:56 2011 (+0800)
+;; Last-Updated: Thu Feb  3 18:59:06 2011 (+0800)
 ;;           By: Le Wang
-;;     Update #: 3
-;; URL: https://github.com/lewang/le_emacs_libs/blob/master/LRU-yank.el
+;;     Update #: 4
+;; URL: https://github.com/lewang/le_emacs_LRU_yank
 ;; Keywords:
 ;; Compatibility: GNU Emacs 21, 23.2.1
 ;; Keywords: convenience editing
