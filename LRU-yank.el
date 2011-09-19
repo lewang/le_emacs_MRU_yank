@@ -9,9 +9,9 @@
 ;; Copyright (c) 2006, 2011 Le Wang
 
 ;; Version: 0.2
-;; Last-Updated: Thu Feb  3 18:59:06 2011 (+0800)
+;; Last-Updated: Tue Sep 20 02:42:06 2011 (+0800)
 ;;           By: Le Wang
-;;     Update #: 4
+;;     Update #: 5
 ;; URL: https://github.com/lewang/le_emacs_LRU_yank
 ;; Keywords:
 ;; Compatibility: GNU Emacs 21, 23.2.1
@@ -72,8 +72,6 @@
 (provide 'LRU-yank)
 (eval-when-compile
   (require 'cl))
-
-(provide 'LRU-yank)
 
 (defcustom LRU-yank-mode nil
   "*Non-nil means use use LRU order when yanking."
