@@ -9,9 +9,9 @@
 ;; Copyright (c) 2006, 2011 Le Wang
 
 ;; Version: 0.2
-;; Last-Updated: Tue Sep 20 02:42:06 2011 (+0800)
+;; Last-Updated: Sun Nov  6 15:31:10 2011 (+0800)
 ;;           By: Le Wang
-;;     Update #: 5
+;;     Update #: 12
 ;; URL: https://github.com/lewang/le_emacs_LRU_yank
 ;; Keywords:
 ;; Compatibility: GNU Emacs 21, 23.2.1
@@ -116,11 +116,25 @@ return the new list."
           (and (not (eq last-command 'yank))
                (or
                 (and (= (ad-get-arg 0) 0)
-                     interprogram-paste-function
-                     (prog1
-                         (funcall interprogram-paste-function)
-                       ;; reset it so it can be accessed again
-                       (setq x-last-selected-text nil)))
+                     ;; reset it so it can be accessed again
+                     (cond  ((memq interprogram-paste-function '(x-get-selection-value
+                                                                 x-selection-value))
+                             (prog1
+                                 (funcall interprogram-paste-function)
+                               (setq x-last-selected-text nil)
+                               ;; It's infuriating that `ns-win.el' chose to
+                               ;; rename these varialbes instead of keeping
+                               ;; the standard "x-" names.  It makes all
+                               ;; packages that use x-selection stuff have to
+                               ;; be Mac aware.  w32-fns does the right thing
+                               ;; for Windows, though.
+                               (when (boundp 'ns-last-selected-text)
+                                 (setq ns-last-selected-text nil))))
+                            ((null interprogram-paste-function)
+                             nil)
+                            (t
+                             (message "LRU-yank: I don't know how to support %s" interprogram-paste-function)
+                             nil)))
                 (not kill-ring)      ; empty kill-ring
                 )))
       ad-do-it
