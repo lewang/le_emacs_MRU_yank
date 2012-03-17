@@ -9,9 +9,9 @@
 ;; Copyright (c) 2006, 2011 Le Wang
 
 ;; Version: 0.2
-;; Last-Updated: Wed Nov 30 23:46:02 2011 (+0800)
+;; Last-Updated: Thu Mar  8 15:50:42 2012 (+0800)
 ;;           By: Le Wang
-;;     Update #: 14
+;;     Update #: 17
 ;; URL: https://github.com/lewang/le_emacs_LRU_yank
 ;; Keywords:
 ;; Compatibility: GNU Emacs 21, 23.2.1
@@ -70,6 +70,7 @@
 ;;; Code:
 
 (provide 'LRU-yank)
+
 (eval-when-compile
   (require 'cl))
 
@@ -116,19 +117,17 @@ return the new list."
           (and (not (eq last-command 'yank))
                (or
                 (and (= (ad-get-arg 0) 0)
-                     ;; reset it so it can be accessed again
+                     ;; reset clipboard so it can be accessed again
                      (cond  ((memq interprogram-paste-function '(x-get-selection-value
                                                                  x-selection-value))
                              (when (funcall interprogram-paste-function)
-                               (setq x-last-selected-text nil)
-                               ;; It's infuriating that `ns-win.el' chose to
-                               ;; rename these varialbes instead of keeping
-                               ;; the standard "x-" names.  It makes all
-                               ;; packages that use x-selection stuff have to
-                               ;; be Mac aware.  w32-fns does the right thing
-                               ;; for Windows, though.
-                               (when (boundp 'ns-last-selected-text)
-                                 (setq ns-last-selected-text nil))
+                               (set (cond ((eq window-system 'mac)
+                                           'x-last-selected-text-clipboard)
+                                          ((eq window-system 'ns)
+                                           'ns-last-selected-text)
+                                          (t
+                                           'x-last-selected-text))
+                                    nil)
                                t))
                             ((null interprogram-paste-function)
                              nil)
