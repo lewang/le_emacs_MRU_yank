@@ -1,7 +1,7 @@
-;;; LRU-yank.el --- Least Recently Used stacking for kill-ring
+;;; MRU-yank.el --- Most Recently Used stacking for kill-ring
 
-;; Filename: LRU-yank.el
-;; Description: Least Recently Used stacking for kill-ring
+;; Filename: MRU-yank.el
+;; Description: Most Recently Used stacking for kill-ring
 ;; Author: Le Wang
 ;; Maintainer:  Le Wang (lewang.emacs!!!gmayo.com remove exclamations, correct host, hint: google mail)
 ;; Created: 2006/07/08 07:35:50
@@ -9,10 +9,10 @@
 ;; Copyright (c) 2006, 2011 Le Wang
 
 ;; Version: 0.2
-;; Last-Updated: Thu Mar  8 15:50:42 2012 (+0800)
+;; Last-Updated: Wed Apr  4 08:00:33 2012 (+0800)
 ;;           By: Le Wang
-;;     Update #: 17
-;; URL: https://github.com/lewang/le_emacs_LRU_yank
+;;     Update #: 18
+;; URL: https://github.com/lewang/le_emacs_MRU_yank
 ;; Keywords:
 ;; Compatibility: GNU Emacs 21, 23.2.1
 ;; Keywords: convenience editing
@@ -34,7 +34,7 @@
 
 ;;; Commentary:
 
-;; Implements LRU (Least Recently Used) stacking for kill-ring.
+;; Implements MRU (Most Recently Used) stacking for kill-ring.
 ;;
 ;; By default Emacs treats the kill-ring as a "ring", I find it more useful
 ;; to move each yanked item to the top of a stack instead.  This way
@@ -58,8 +58,8 @@
 ;;   Put this file into your load-path and the following into your
 ;;   ~/.emacs:
 ;;
-;;   (require 'LRU-yank)
-;;   (setq LRU-yank-mode t)
+;;   (require 'MRU-yank)
+;;   (setq MRU-yank-mode t)
 
 ;;; Related packages:
 
@@ -69,18 +69,18 @@
 
 ;;; Code:
 
-(provide 'LRU-yank)
+(provide 'MRU-yank)
 
 (eval-when-compile
   (require 'cl))
 
-(defcustom LRU-yank-mode nil
-  "*Non-nil means use use LRU order when yanking."
+(defcustom MRU-yank-mode nil
+  "*Non-nil means use use MRU order when yanking."
   :type 'boolean
   :group 'killing)
 
-(defvar LRU-yank-count nil)
-(defvar LRU-yank-count-prev nil)
+(defvar MRU-yank-count nil)
+(defvar MRU-yank-count-prev nil)
 
 (defun list-reorder (list i j)
   "move j_th elt of list to the i_th position, use i=0 for head.
@@ -107,13 +107,13 @@ return the new list."
       (setcdr (nthcdr (- i 1) list) j-element)
       (nconc list i-after-list))))
 
-(defadvice current-kill (around LRU-yank activate compile)
+(defadvice current-kill (around MRU-yank activate compile)
   "kill-ring stacking hook"
   (when (not (eq last-command 'yank))
-    (setq LRU-yank-count 0)
-    (setq LRU-yank-count-prev 0))
+    (setq MRU-yank-count 0)
+    (setq MRU-yank-count-prev 0))
 
-  (if (or (not LRU-yank-mode)
+  (if (or (not MRU-yank-mode)
           (and (not (eq last-command 'yank))
                (or
                 (and (= (ad-get-arg 0) 0)
@@ -132,17 +132,17 @@ return the new list."
                             ((null interprogram-paste-function)
                              nil)
                             (t
-                             (message "LRU-yank: I don't know how to support %s" interprogram-paste-function)
+                             (message "MRU-yank: I don't know how to support %s" interprogram-paste-function)
                              nil)))
                 (not kill-ring)      ; empty kill-ring
                 )))
       ad-do-it
-    (setq LRU-yank-count (+ LRU-yank-count (ad-get-arg 0)))
-    (let ((n (mod LRU-yank-count
+    (setq MRU-yank-count (+ MRU-yank-count (ad-get-arg 0)))
+    (let ((n (mod MRU-yank-count
                   (length kill-ring)))
-          (n-prev (mod LRU-yank-count-prev
+          (n-prev (mod MRU-yank-count-prev
                        (length kill-ring))))
-      (when (not (= LRU-yank-count 0))
+      (when (not (= MRU-yank-count 0))
         (if (= n 0)
             (setq kill-ring (list-reorder kill-ring
                                           (- (length kill-ring)
@@ -151,9 +151,9 @@ return the new list."
           (setq kill-ring (list-reorder kill-ring n-prev 0)
                 kill-ring (list-reorder kill-ring 0 n))))
       (setq kill-ring-yank-pointer kill-ring)
-      (setq LRU-yank-count-prev LRU-yank-count)
+      (setq MRU-yank-count-prev MRU-yank-count)
       (setq ad-return-value (car kill-ring)))))
 
 
 
-;;; LRU-yank.el ends here
+;;; MRU-yank.el ends here
